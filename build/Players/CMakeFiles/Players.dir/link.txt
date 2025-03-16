@@ -1,0 +1,2 @@
+/usr/bin/ar qc libPlayers.a CMakeFiles/Players.dir/Dice.cpp.o CMakeFiles/Players.dir/GameLogic.cpp.o CMakeFiles/Players.dir/Player.cpp.o
+/usr/bin/ranlib libPlayers.a

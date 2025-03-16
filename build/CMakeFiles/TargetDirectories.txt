@@ -1,0 +1,6 @@
+/home/kubik/IU5-Monopoly/build/CMakeFiles/monopoly.dir
+/home/kubik/IU5-Monopoly/build/CMakeFiles/edit_cache.dir
+/home/kubik/IU5-Monopoly/build/CMakeFiles/rebuild_cache.dir
+/home/kubik/IU5-Monopoly/build/Players/CMakeFiles/Players.dir
+/home/kubik/IU5-Monopoly/build/Players/CMakeFiles/edit_cache.dir
+/home/kubik/IU5-Monopoly/build/Players/CMakeFiles/rebuild_cache.dir
