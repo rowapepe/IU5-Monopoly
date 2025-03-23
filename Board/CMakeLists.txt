@@ -4,8 +4,8 @@ project(Board)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCES Board.cpp)
-set(HEADERS Board.hpp)
+set(SOURCES Board.cpp Cell.cpp)
+set(HEADERS Board.hpp Cell.hpp)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 
