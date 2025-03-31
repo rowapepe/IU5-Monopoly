@@ -6,12 +6,12 @@ namespace {}
 
 namespace Board {
 class Board {
-  std::vector<Streets::Streets> board;
   void initialize();
 
 public:
+  std::vector<Streets::Streets> board;
   Board();
 
-  
+  const std::vector<Streets::Streets> &getBoard() const;
 };
 } // namespace Board

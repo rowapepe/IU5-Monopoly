@@ -32,4 +32,5 @@
 *.app
 
 /build
-/test
+CMakeLists.txt
+main.cpp
