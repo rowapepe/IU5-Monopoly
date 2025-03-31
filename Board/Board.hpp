@@ -11,7 +11,5 @@ class Board {
 public:
   std::vector<Streets::Streets> board;
   Board();
-
-  const std::vector<Streets::Streets> &getBoard() const;
 };
 } // namespace Board

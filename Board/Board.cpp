@@ -46,6 +46,4 @@ void Board::initialize() {
   board.emplace_back("налог", "Сверхналог", 0, 100, 0);
   board.emplace_back("улица", "ул. Арбат", 400, 34, 0);
 }
-
-const std::vector<Streets::Streets> &Board::getBoard() const { return board; }
 } // namespace Board
