@@ -87,14 +87,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/kubik/IU5-Monopoly/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/kubik/IU5-Monopoly/build/CMakeFiles /home/kubik/IU5-Monopoly/build/Players//CMakeFiles/progress.marks
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Players/all
+	cd /home/kubik/IU5-Monopoly/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/kubik/IU5-Monopoly/build/CMakeFiles /home/kubik/IU5-Monopoly/build/Board//CMakeFiles/progress.marks
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Board/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/kubik/IU5-Monopoly/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Players/clean
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Board/clean
 .PHONY : clean
 
 # The main clean target
@@ -103,12 +103,12 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Players/preinstall
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Board/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Players/preinstall
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Board/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
@@ -117,90 +117,90 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-Players/CMakeFiles/Players.dir/rule:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Players/CMakeFiles/Players.dir/rule
-.PHONY : Players/CMakeFiles/Players.dir/rule
+Board/CMakeFiles/Board.dir/rule:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Board/CMakeFiles/Board.dir/rule
+.PHONY : Board/CMakeFiles/Board.dir/rule
 
 # Convenience name for target.
-Players: Players/CMakeFiles/Players.dir/rule
-.PHONY : Players
+Board: Board/CMakeFiles/Board.dir/rule
+.PHONY : Board
 
 # fast build rule for target.
-Players/fast:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/build
-.PHONY : Players/fast
+Board/fast:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/build
+.PHONY : Board/fast
 
-Dice.o: Dice.cpp.o
-.PHONY : Dice.o
-
-# target to build an object file
-Dice.cpp.o:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/Dice.cpp.o
-.PHONY : Dice.cpp.o
-
-Dice.i: Dice.cpp.i
-.PHONY : Dice.i
-
-# target to preprocess a source file
-Dice.cpp.i:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/Dice.cpp.i
-.PHONY : Dice.cpp.i
-
-Dice.s: Dice.cpp.s
-.PHONY : Dice.s
-
-# target to generate assembly for a file
-Dice.cpp.s:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/Dice.cpp.s
-.PHONY : Dice.cpp.s
-
-GameLogic.o: GameLogic.cpp.o
-.PHONY : GameLogic.o
+Board.o: Board.cpp.o
+.PHONY : Board.o
 
 # target to build an object file
-GameLogic.cpp.o:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/GameLogic.cpp.o
-.PHONY : GameLogic.cpp.o
+Board.cpp.o:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/Board.cpp.o
+.PHONY : Board.cpp.o
 
-GameLogic.i: GameLogic.cpp.i
-.PHONY : GameLogic.i
+Board.i: Board.cpp.i
+.PHONY : Board.i
 
 # target to preprocess a source file
-GameLogic.cpp.i:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/GameLogic.cpp.i
-.PHONY : GameLogic.cpp.i
+Board.cpp.i:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/Board.cpp.i
+.PHONY : Board.cpp.i
 
-GameLogic.s: GameLogic.cpp.s
-.PHONY : GameLogic.s
+Board.s: Board.cpp.s
+.PHONY : Board.s
 
 # target to generate assembly for a file
-GameLogic.cpp.s:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/GameLogic.cpp.s
-.PHONY : GameLogic.cpp.s
+Board.cpp.s:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/Board.cpp.s
+.PHONY : Board.cpp.s
 
-Player.o: Player.cpp.o
-.PHONY : Player.o
+Cards.o: Cards.cpp.o
+.PHONY : Cards.o
 
 # target to build an object file
-Player.cpp.o:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/Player.cpp.o
-.PHONY : Player.cpp.o
+Cards.cpp.o:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/Cards.cpp.o
+.PHONY : Cards.cpp.o
 
-Player.i: Player.cpp.i
-.PHONY : Player.i
+Cards.i: Cards.cpp.i
+.PHONY : Cards.i
 
 # target to preprocess a source file
-Player.cpp.i:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/Player.cpp.i
-.PHONY : Player.cpp.i
+Cards.cpp.i:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/Cards.cpp.i
+.PHONY : Cards.cpp.i
 
-Player.s: Player.cpp.s
-.PHONY : Player.s
+Cards.s: Cards.cpp.s
+.PHONY : Cards.s
 
 # target to generate assembly for a file
-Player.cpp.s:
-	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Players/CMakeFiles/Players.dir/build.make Players/CMakeFiles/Players.dir/Player.cpp.s
-.PHONY : Player.cpp.s
+Cards.cpp.s:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/Cards.cpp.s
+.PHONY : Cards.cpp.s
+
+Cells.o: Cells.cpp.o
+.PHONY : Cells.o
+
+# target to build an object file
+Cells.cpp.o:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/Cells.cpp.o
+.PHONY : Cells.cpp.o
+
+Cells.i: Cells.cpp.i
+.PHONY : Cells.i
+
+# target to preprocess a source file
+Cells.cpp.i:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/Cells.cpp.i
+.PHONY : Cells.cpp.i
+
+Cells.s: Cells.cpp.s
+.PHONY : Cells.s
+
+# target to generate assembly for a file
+Cells.cpp.s:
+	cd /home/kubik/IU5-Monopoly/build && $(MAKE) $(MAKESILENT) -f Board/CMakeFiles/Board.dir/build.make Board/CMakeFiles/Board.dir/Cells.cpp.s
+.PHONY : Cells.cpp.s
 
 # Help Target
 help:
@@ -210,16 +210,16 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... Players"
-	@echo "... Dice.o"
-	@echo "... Dice.i"
-	@echo "... Dice.s"
-	@echo "... GameLogic.o"
-	@echo "... GameLogic.i"
-	@echo "... GameLogic.s"
-	@echo "... Player.o"
-	@echo "... Player.i"
-	@echo "... Player.s"
+	@echo "... Board"
+	@echo "... Board.o"
+	@echo "... Board.i"
+	@echo "... Board.s"
+	@echo "... Cards.o"
+	@echo "... Cards.i"
+	@echo "... Cards.s"
+	@echo "... Cells.o"
+	@echo "... Cells.i"
+	@echo "... Cells.s"
 .PHONY : help
 
 

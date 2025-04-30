@@ -1,1 +1,1 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/monopoly.dir/link.d CMakeFiles/monopoly.dir/main.cpp.o -o monopoly  Players/libPlayers.a
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/monopoly.dir/link.d CMakeFiles/monopoly.dir/main.cpp.o -o monopoly  Players/libPlayers.a Board/libBoard.a

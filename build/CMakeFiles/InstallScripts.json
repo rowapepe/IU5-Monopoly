@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/kubik/IU5-Monopoly/build/cmake_install.cmake",
+		"/home/kubik/IU5-Monopoly/build/Players/cmake_install.cmake",
+		"/home/kubik/IU5-Monopoly/build/Board/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

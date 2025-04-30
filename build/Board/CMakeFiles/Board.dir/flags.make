@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/kubik/IU5-Monopoly/Players
+CXX_INCLUDES = -I/home/kubik/IU5-Monopoly/Board
 
 CXX_FLAGS = 
 
