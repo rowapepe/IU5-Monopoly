@@ -5,7 +5,7 @@ namespace {}
 namespace Board {
 Board::Board() { initialize(); }
 void Board::initialize() {
-  board.emplace_back("старт", "Старт", 0, 0, -1);
+  board.emplace_back("старт", "Старт", 0, 0, -1,5);
   board.emplace_back("улица", "Житная ул.", 60, 2, -1);
   board.emplace_back("казна", "Общественная казна", 0, 0, -1);
   board.emplace_back("улица", "ул. Нагатинская", 60, 4, -1);
@@ -48,7 +48,7 @@ void Board::initialize() {
 }
 void Board::printBoard(){
   for(int i = 0;i<board.size();++i){
-    std::cout<<board[i].getName()<<' '<<board[i].getOwnerIndex()<<' '<<i<<std::endl;
+    std::cout<<board[i].getName()<<' '<<board[i].getOwnerIndex()<<' '<<i<<' '<<board[i].getLVL()<<std::endl;
   }
 }
 } // namespace Board

@@ -7,10 +7,11 @@
 #include "Board/Cells.hpp"
 
 int main () {
-    Players::Players* players=new Players::Players[3];
+    std::vector<Players::Players> players(3);
+
     Board::Board test;
-    int size=3;
-    for(int i=0;i<size;++i){
+
+    for(int i=0;i<players.size();++i){
         players[i].Print();
     }
 
@@ -21,6 +22,6 @@ int main () {
     test.printBoard();
 
     std::cout<<Dice::RollDice()<<std::endl;
-    Players::Players::DeletePlayers(players);
+    
     return 0;
 }
