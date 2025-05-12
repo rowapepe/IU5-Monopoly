@@ -21,11 +21,13 @@ public:
   void Print();
   void SetMoney(int m);
   int GetMoney();
+  void PayTax();
   void BuyStreet( std::vector<Streets::Streets>& board,int index);
+  void SellStreet( std::vector<Streets::Streets>& board,int index);
   void UpgradeStreet(std::vector<Streets::Streets>& board,int index);
   void DegradeStreet(std::vector<Streets::Streets>& board,int index);
   void PayRent(std::vector<Streets::Streets>& board,std::vector<Players> players,int index);
-  void Bankrupt();
+  static bool Bankrupt(std::vector<Players> players);
 
 };
 } // namespace Players
