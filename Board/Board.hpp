@@ -1,5 +1,6 @@
 #pragma once
 #include "Cells.hpp"
+#include <iostream>
 #include <vector>
 
 namespace {}
@@ -10,6 +11,7 @@ class Board {
 
 public:
   std::vector<Streets::Streets> board;
+  void printBoard();
   Board();
 };
 } // namespace Board
