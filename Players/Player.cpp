@@ -1,15 +1,40 @@
 #include "Player.hpp"
+
 namespace Players {
-Players::Players() : bankrupt(0), money(15000), position(0) {}
+Players::Players() : bankrupt(0), money(1500), position(0) {}
 Players::Players(int bankrupt, int money, int position)
     : bankrupt(bankrupt), money(money), position(position) {}
 void Players::Move(int steps, int boardSize) {
   position = (position + steps) % boardSize;
 }
 
-void Players::BuyStreet(std::vector<Streets::Streets> &board, int index) {
+void Players::SetPosition(int newPosition) { this->position = newPosition; }
+
+void Players::SellStreet(std::vector<Streets::Streets> &board, int index) {
   if (board[position].getType() != "улица") {
     std::cout << "Это не улица, нельзя купить";
+    return;
+  }
+  if (board[position].getOwnerIndex() == -1) {
+    std::cout << "Некуплена никем";
+    return;
+  }
+  if (board[position].getOwnerIndex() == index) {
+
+    board[position].setOwnerIndex(-1);
+    money = money + board[position].getPrice() * 0.8;
+    return;
+
+  } else {
+    std::cout << "Улица куплена не вами";
+    return;
+  }
+}
+
+void Players::BuyStreet(std::vector<Streets::Streets> &board, int index) {
+  if (board[position].getType() != "улица" &&
+      board[position].getType() != "имущество") {
+    std::cout << "Это не улица или имущество, нельзя купить";
     return;
   }
   if (board[position].getOwnerIndex() == index) {
@@ -17,7 +42,7 @@ void Players::BuyStreet(std::vector<Streets::Streets> &board, int index) {
     return;
   }
   if (board[position].getOwnerIndex() == -1) {
-    if (board[position].getPrice() < money) {
+    if (board[position].getPrice() <= money) {
       board[position].setOwnerIndex(index);
       money = money - board[position].getPrice();
       return;
@@ -80,25 +105,45 @@ void Players::SetMoney(int m) { money = m; }
 int Players::GetMoney() const { return money; }
 int Players::GetPosition() const { return position; }
 
-void Players::EarnMoneyFromRound() { this->money += 200; }
-void Players::PayTax() { this->money -= 200; }
+void Players::EarnMoney(int m) { this->money += m; }
 
-void Players::PayRent(std::vector<Streets::Streets> &board,
-                      std::vector<Players> players, int index) {
-  if (board[position].getOwnerIndex() == -1) {
-    std::cout << "Улица никому не принадлежит, не надо нчиего платить";
+void Players::PayRent(Streets::Streets &cell, std::vector<Players> &players) {
+  if (cell.getOwnerIndex() == -1) {
+    std::cout << "Улица никому не принадлежит, не надо ничего платить";
     return;
   }
-  if (board[position].getRent() < money) {
-    players[board[position].getOwnerIndex()].SetMoney(
-        players[board[position].getOwnerIndex()].GetMoney() +
-        board[position].getRent());
-    money = money - board[position].getRent();
+  if (cell.getRent() < money) {
+    players[cell.getOwnerIndex()].money += cell.getRent();
+    money -= cell.getRent();
     return;
-
   } else {
-    std::cout << "Недосататочно средств";
+    std::cout << "Недоcтаточно средств";
     return;
   }
 }
+
+void Players::PayTax(int taxAmount) {
+  if (money < taxAmount) {
+    std::cout << "Недостаточно денег";
+    return;
+  }
+  money -= taxAmount;
+}
+
+bool Players::Bankrupt(std::vector<Players> players) {
+  bool res{};
+  for (int i = 0; i < players.size(); ++i) {
+    res += players[i].bankrupt;
+  }
+  return res;
+}
+
+void Players::GoToJail() {
+  isInJail = true;
+  position = 10;
+}
+
+void Players::LeaveJail() { isInJail = false; }
+
+bool Players::IsInJail() const { return isInJail; }
 } // namespace Players

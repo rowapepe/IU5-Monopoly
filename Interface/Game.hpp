@@ -28,6 +28,9 @@ private:
   State currentState;
   State previousState;
 
+  bool IsPositionValid(int position) const;
+  bool rolledDoubleCurrentMove;
+
   sf::Text confirmationText;
   sf::RectangleShape confirmationBackground;
   sf::RectangleShape yesButton, noButton;
@@ -47,6 +50,8 @@ private:
   sf::Text buyText;
   sf::RectangleShape endTurnButton;
   sf::Text endTurnText;
+  sf::RectangleShape jailPayButton;
+  sf::Text jailPayText;
 
   sf::Text diceResultText;
   sf::Text playerInfoText;
@@ -54,11 +59,17 @@ private:
 
   bool showBuyButton = false;
   bool showEndTurnButton = false;
+  bool showJailPayButton = false;
 
   sf::RectangleShape messageBoxBackground;
   sf::Text messageBoxText;
   sf::RectangleShape messageBoxOkButton;
   sf::Text messageBoxOkText;
+
+  Cards::Deck chanceDeck;
+  Cards::Deck communityChestDeck;
+  void handleChanceCard();
+  void handleCommunityChestCard();
 
   void loadResources();
   void setupUI();
@@ -80,11 +91,12 @@ private:
   void handleGameInput(sf::Event event);
   void handleConfirmationInput(sf::Event event);
   void handleMessageBoxInput(sf::Event event);
+
+  void handleJail();
+
   void processTurn(int diceRoll, bool isDouble);
   void startNextTurn();
   void playerAction_BuyProperty();
   void playerAction_EndTurn();
-  void payRent(Players::Players &payer, int ownerIndex, int rentAmount);
-  void payTax(Players::Players &payer, int taxAmount);
   void showMessage(const std::wstring &message, bool endTurnAfter = true);
 };

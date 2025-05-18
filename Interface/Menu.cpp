@@ -3,7 +3,8 @@
 #include <iostream>
 
 Menu::Menu()
-    : window(sf::VideoMode(1280, 800), L"Монополия - Меню"),
+    : window(sf::VideoMode(1280, 800), L"Монополия - Меню",
+             sf::Style::Titlebar | sf::Style::Close),
       volumeSlider(800, 500, 200, 0, 100) {
   window.setVerticalSyncEnabled(true);
   if (!font.loadFromFile("../assets/KabelCTT Medium.ttf")) {
@@ -21,7 +22,7 @@ Menu::Menu()
     std::cerr << "Ошибка загрузки музыки!" << std::endl;
   } else {
     backgroundMusic.setLoop(true);
-    backgroundMusic.setVolume(0);
+    backgroundMusic.setVolume(20);
     backgroundMusic.play();
   }
   volumeText.setFont(font);
