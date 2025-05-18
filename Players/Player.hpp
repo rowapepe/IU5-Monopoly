@@ -27,7 +27,7 @@ public:
   void UpgradeStreet(std::vector<Streets::Streets>& board,int index);
   void DegradeStreet(std::vector<Streets::Streets>& board,int index);
   void PayRent(std::vector<Streets::Streets>& board,std::vector<Players> players,int index);
-  static bool Bankrupt(std::vector<Players> players);
+  static bool IsEnd(std::vector<Players> players);
 
 };
 } // namespace Players

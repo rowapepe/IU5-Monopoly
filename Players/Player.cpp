@@ -140,13 +140,18 @@ void Players::PayTax(){
     }
     money=money-tax;
 }
-bool Players::Bankrupt(std::vector<Players> players){
-    bool res{};
+bool Players::IsEnd(std::vector<Players> players){
+    int k=0;
     for(int i=0;i<players.size();++i){
-        res+=players[i].bankrupt;
+        if(players[i].bankrupt==false){
+            k+=1;
+        }
 
     }
-    return res;
+    if (k==1){
+        return true
+    }
+    return false;
 
 }
 
