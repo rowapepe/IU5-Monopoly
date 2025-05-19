@@ -21,6 +21,8 @@ public:
   void Move(int steps, int boardSize);
   void Print();
   void SetMoney(int m);
+  void SetBankrupt(bool b);
+  bool GetBankrupt() const;
 
   int GetMoney() const;
   int GetPosition() const;
@@ -40,6 +42,7 @@ public:
   void LeaveJail();
   bool IsInJail() const;
 
-  bool Bankrupt(std::vector<Players> players);
+  static bool IsEnd(std::vector<Players> &players);
+
 };
 } // namespace Players

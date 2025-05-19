@@ -158,8 +158,23 @@ void Game::setupGameUI() {
   playerInfoText.setFont(gameFont);
   playerInfoText.setCharacterSize(18);
   playerInfoText.setFillColor(sf::Color::Black);
-  playerInfoText.setPosition(windowSize.x - 230.f, windowSize.y - 150.f);
+  playerInfoText.setPosition(windowSize.x - 230.f, rollDiceButton.getPosition().y / 2.0f);
   playerInfoText.setString(L"");
+
+  bankruptButton.setSize({150, 50});
+  bankruptButton.setFillColor(sf::Color::Magenta);
+  bankruptButton.setPosition(windowSize.x - 230.f, windowSize.y - 150.f);
+  bankruptText.setFont(gameFont);
+  bankruptText.setString(L"Я банкрот");
+  bankruptText.setCharacterSize(20);
+  bankruptText.setFillColor(sf::Color::White);
+  textBounds = bankruptText.getLocalBounds();
+  bankruptText.setOrigin(textBounds.left + textBounds.width / 2.0f,
+                         textBounds.top + textBounds.height / 2.0f);
+  bankruptText.setPosition(
+    bankruptButton.getPosition().x + bankruptButton.getSize().x / 2.0f,
+    bankruptButton.getPosition().y + bankruptButton.getSize().y / 2.0f);
+
 }
 
 void Game::setupMessageBoxUI() {
@@ -321,9 +336,14 @@ void Game::handleEvents() {
 }
 
 void Game::handleGameInput(sf::Event event) {
-  if (currentState != State::Running)
+  if(Players::Players::IsEnd(players)){
+    currentState=State::GameOver;
+  }
+  if (currentState != State::Running){
+    gameWindow.close();
     return;
-
+    
+  }
   if (event.type == sf::Event::MouseButtonPressed &&
       event.mouseButton.button == sf::Mouse::Left) {
     sf::Vector2f mousePos =
@@ -350,6 +370,10 @@ void Game::handleGameInput(sf::Event event) {
 
     if (showBuyButton && buyButton.getGlobalBounds().contains(mousePos)) {
       playerAction_BuyProperty();
+      return;
+    }
+    if (showBuyButton && bankruptButton.getGlobalBounds().contains(mousePos)) {
+      playerAction_BeBankrupt();
       return;
     }
 
@@ -604,6 +628,13 @@ void Game::processTurn(int diceRoll, bool isDouble) {
     }
   }
 }
+void Game::playerAction_BeBankrupt(){
+  if (!actionRequired || !showBuyButton)
+    return;
+  Players::Players &currentPlayer = players[currentPlayerIndex];
+  currentPlayer.SetBankrupt(1);
+
+}
 
 void Game::playerAction_BuyProperty() {
   if (!actionRequired || !showBuyButton)
@@ -661,7 +692,11 @@ void Game::playerAction_EndTurn() {
 }
 
 void Game::startNextTurn() {
+
   currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+  while(players[currentPlayerIndex].GetBankrupt()==true){
+    currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+  }
   consecutiveDoubles = 0;
   rolledDoubleCurrentMove = false;
 
@@ -813,6 +848,8 @@ void Game::renderGame() {
   if (showBuyButton) {
     gameWindow.draw(buyButton);
     gameWindow.draw(buyText);
+    gameWindow.draw(bankruptButton);
+    gameWindow.draw(bankruptText);
   }
 
   if (showEndTurnButton) {

@@ -52,12 +52,15 @@ private:
   sf::Text endTurnText;
   sf::RectangleShape jailPayButton;
   sf::Text jailPayText;
+  sf::RectangleShape bankruptButton;
+  sf::Text bankruptText;
 
   sf::Text diceResultText;
   sf::Text playerInfoText;
   sf::Text turnIndicatorText;
 
   bool showBuyButton = false;
+  bool showBankruptButton = false;
   bool showEndTurnButton = false;
   bool showJailPayButton = false;
 
@@ -97,6 +100,7 @@ private:
   void processTurn(int diceRoll, bool isDouble);
   void startNextTurn();
   void playerAction_BuyProperty();
+  void playerAction_BeBankrupt();
   void playerAction_EndTurn();
   void showMessage(const std::wstring &message, bool endTurnAfter = true);
 };

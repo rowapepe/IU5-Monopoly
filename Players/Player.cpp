@@ -103,6 +103,8 @@ void Players::DegradeStreet(std::vector<Streets::Streets> &board, int index) {
 }
 void Players::SetMoney(int m) { money = m; }
 int Players::GetMoney() const { return money; }
+void Players::SetBankrupt(bool b){ bankrupt = b; }
+bool Players::GetBankrupt()const { return bankrupt; }
 int Players::GetPosition() const { return position; }
 
 void Players::EarnMoney(int m) { this->money += m; }
@@ -130,13 +132,19 @@ void Players::PayTax(int taxAmount) {
   money -= taxAmount;
 }
 
-bool Players::Bankrupt(std::vector<Players> players) {
-  bool res{};
+bool Players::IsEnd(std::vector<Players> &players) {
+  int k = 0;
   for (int i = 0; i < players.size(); ++i) {
-    res += players[i].bankrupt;
+    if (players[i].bankrupt == false) {
+      k += 1;
+    }
   }
-  return res;
+  if (k == 1) {
+    return true;
+  }
+  return false;
 }
+
 
 void Players::GoToJail() {
   isInJail = true;
