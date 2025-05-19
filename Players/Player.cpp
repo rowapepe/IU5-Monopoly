@@ -149,7 +149,7 @@ bool Players::IsEnd(std::vector<Players> players){
 
     }
     if (k==1){
-        return true
+        return true;
     }
     return false;
 
