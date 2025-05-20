@@ -158,23 +158,20 @@ void Game::setupGameUI() {
   playerInfoText.setFont(gameFont);
   playerInfoText.setCharacterSize(18);
   playerInfoText.setFillColor(sf::Color::Black);
-  playerInfoText.setPosition(windowSize.x - 230.f, rollDiceButton.getPosition().y / 2.0f);
+  playerInfoText.setPosition(windowSize.x - 230.f,
+                             rollDiceButton.getPosition().y / 2.0f);
   playerInfoText.setString(L"");
 
-  bankruptButton.setSize({150, 50});
-  bankruptButton.setFillColor(sf::Color::Magenta);
-  bankruptButton.setPosition(windowSize.x - 230.f, windowSize.y - 150.f);
-  bankruptText.setFont(gameFont);
-  bankruptText.setString(L"Я банкрот");
-  bankruptText.setCharacterSize(20);
-  bankruptText.setFillColor(sf::Color::White);
-  textBounds = bankruptText.getLocalBounds();
-  bankruptText.setOrigin(textBounds.left + textBounds.width / 2.0f,
-                         textBounds.top + textBounds.height / 2.0f);
-  bankruptText.setPosition(
-    bankruptButton.getPosition().x + bankruptButton.getSize().x / 2.0f,
-    bankruptButton.getPosition().y + bankruptButton.getSize().y / 2.0f);
-
+  jailPayButton.setSize({180, 50});
+  jailPayButton.setFillColor(sf::Color::Yellow);
+  jailPayButton.setPosition(windowSize.x - 230.f, buttonY- 120);
+  jailPayText.setFont(gameFont);
+  jailPayText.setString(L"Заплатить залог");
+  jailPayText.setCharacterSize(20);
+  jailPayText.setFillColor(sf::Color::Black);
+  textBounds = jailPayButton.getLocalBounds();
+  jailPayText.setOrigin(textBounds.left + textBounds.width / 2.0f,
+                        textBounds.top + textBounds.height / 2.0f);
 }
 
 void Game::setupMessageBoxUI() {
@@ -215,9 +212,8 @@ void Game::setupMessageBoxUI() {
 void Game::setupPlayers(int numberOfPlayers) {
   players.clear();
   playerTokens.clear();
-  std::vector<sf::Color> colors = {sf::Color::Red,     sf::Color::Blue,
-                                   sf::Color::Green,   sf::Color::Yellow,
-                                   sf::Color::Magenta, sf::Color::Cyan};
+  std::vector<sf::Color> colors = {sf::Color::Red, sf::Color::Blue,
+                                   sf::Color::Green, sf::Color::Yellow};
   for (int i = 0; i < numberOfPlayers; ++i) {
     players.emplace_back();
     sf::CircleShape token(15.f);
@@ -336,13 +332,12 @@ void Game::handleEvents() {
 }
 
 void Game::handleGameInput(sf::Event event) {
-  if(Players::Players::IsEnd(players)){
-    currentState=State::GameOver;
+  if (Players::Players::IsEnd(players)) {
+    currentState = State::GameOver;
   }
-  if (currentState != State::Running){
+  if (currentState != State::Running) {
     gameWindow.close();
     return;
-    
   }
   if (event.type == sf::Event::MouseButtonPressed &&
       event.mouseButton.button == sf::Mouse::Left) {
@@ -370,10 +365,6 @@ void Game::handleGameInput(sf::Event event) {
 
     if (showBuyButton && buyButton.getGlobalBounds().contains(mousePos)) {
       playerAction_BuyProperty();
-      return;
-    }
-    if (showBuyButton && bankruptButton.getGlobalBounds().contains(mousePos)) {
-      playerAction_BeBankrupt();
       return;
     }
 
@@ -628,12 +619,11 @@ void Game::processTurn(int diceRoll, bool isDouble) {
     }
   }
 }
-void Game::playerAction_BeBankrupt(){
+void Game::playerAction_BeBankrupt() {
   if (!actionRequired || !showBuyButton)
     return;
   Players::Players &currentPlayer = players[currentPlayerIndex];
   currentPlayer.SetBankrupt(1);
-
 }
 
 void Game::playerAction_BuyProperty() {
@@ -692,9 +682,8 @@ void Game::playerAction_EndTurn() {
 }
 
 void Game::startNextTurn() {
-
   currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-  while(players[currentPlayerIndex].GetBankrupt()==true){
+  while (players[currentPlayerIndex].GetBankrupt() == true) {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
   }
   consecutiveDoubles = 0;
@@ -783,7 +772,8 @@ void Game::updateUI() {
       sf::String safeCellName =
           sf::String::fromUtf8(utf8CellName.begin(), utf8CellName.end());
 
-      piSs << L"Игрок " << (currentPlayerIndex + 1) << L": $"
+      piSs << L"Игрок " << (currentPlayerIndex + 1) << L" ("
+           << colors[currentPlayerIndex] << L")" << L"\nБаланс: $"
            << currentPlayer.GetMoney() << L"\nПозиция: " << currentPosition
            << L"\n(" << safeCellName.toWideString() << L")";
 
@@ -848,8 +838,6 @@ void Game::renderGame() {
   if (showBuyButton) {
     gameWindow.draw(buyButton);
     gameWindow.draw(buyText);
-    gameWindow.draw(bankruptButton);
-    gameWindow.draw(bankruptText);
   }
 
   if (showEndTurnButton) {

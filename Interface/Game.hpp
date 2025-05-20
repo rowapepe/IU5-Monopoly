@@ -52,15 +52,12 @@ private:
   sf::Text endTurnText;
   sf::RectangleShape jailPayButton;
   sf::Text jailPayText;
-  sf::RectangleShape bankruptButton;
-  sf::Text bankruptText;
 
   sf::Text diceResultText;
   sf::Text playerInfoText;
   sf::Text turnIndicatorText;
 
   bool showBuyButton = false;
-  bool showBankruptButton = false;
   bool showEndTurnButton = false;
   bool showJailPayButton = false;
 
@@ -68,6 +65,8 @@ private:
   sf::Text messageBoxText;
   sf::RectangleShape messageBoxOkButton;
   sf::Text messageBoxOkText;
+
+  std::vector<std::wstring> colors = {L"Красный", L"Синий", L"Зеленый", L"Желтый"};
 
   Cards::Deck chanceDeck;
   Cards::Deck communityChestDeck;
