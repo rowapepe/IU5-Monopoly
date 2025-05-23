@@ -55,9 +55,11 @@ void Players::BuyStreet(std::vector<Streets::Streets> &board, int index) {
     return;
   }
 }
+
 void Players::Print() {
   std::cout << bankrupt << " " << money << " " << position << std::endl;
 }
+
 void Players::UpgradeStreet(std::vector<Streets::Streets> &board, int index) {
   if (board[position].getType() != "улица") {
     std::cout << "Это не улица, нельзя прокачать";

@@ -50,6 +50,14 @@ void Game::loadResources() {
     gameBackgroundSprite.setTexture(gameBackgroundTexture);
     updateGameBackground();
   }
+
+  if (!markerTexture.loadFromFile("../assets/home.jpg")) {
+    std::cerr << "Не удалось загрузить фон assets/home.jpg!" << std::endl;
+  } else {
+    markerTexture.setSmooth(true);
+    markerSprite.setTexture(markerTexture);
+    updateGameBackground();
+  }
 }
 
 bool Game::IsPositionValid(int position) const {
@@ -267,6 +275,10 @@ void Game::setupMessageBoxUI() {
   messageBoxOkText.setOrigin(textBounds.left + textBounds.width / 2.0f,
                              textBounds.top + textBounds.height / 2.0f);
   messageBoxOkText.setPosition(messageBoxOkButton.getPosition());
+
+  markerText.setFont(gameFont);
+  markerText.setCharacterSize(14);
+  markerText.setFillColor(sf::Color::Black);
 }
 
 void Game::setupPlayers(int numberOfPlayers) {
@@ -327,11 +339,12 @@ Game::GameAction Game::run() {
     updateUI();
     render();
   }
-  if (currentState == State::Running || previousState == State::Running) {
-    return GameAction::WindowClosed;
-  } else {
+
+  if (currentState == State::GameOver) {
     return GameAction::Continue;
   }
+
+  return GameAction::WindowClosed;
 }
 
 void Game::handleEvents() {
@@ -383,19 +396,35 @@ void Game::handleEvents() {
       handleMessageBoxInput(event);
       break;
     case State::GameOver:
+      handleGameOverMessage();
       break;
     }
   }
 }
 
+void Game::handleGameOverMessage() {
+  std::wstring text = L"Победитель игры:\n";
+  for (int i = 0; i < players.size(); ++i) {
+    if (!players[i].GetBankrupt()) {
+      text += L"Игрок " + std::to_wstring(i + 1) + L"\n";
+      text += L"С балансом: $" + std::to_wstring(players[i].GetMoney()) + L"\n";
+    }
+  }
+
+  messageBoxText.setString(text);
+  sf::FloatRect textBounds = messageBoxText.getLocalBounds();
+  messageBoxText.setOrigin(textBounds.left + textBounds.width / 2.0f,
+                           textBounds.top + textBounds.height / 2.0f);
+  messageBoxText.setPosition(messageBoxBackground.getPosition().x,
+                             messageBoxBackground.getPosition().y);
+
+  previousState = currentState;
+  currentState = State::DisplayingMessage;
+}
+
 void Game::handleGameInput(sf::Event event) {
   if (Players::Players::IsEnd(players)) {
     currentState = State::GameOver;
-  }
-
-  if (currentState != State::Running) {
-    gameWindow.close();
-    return;
   }
 
   if (event.type == sf::Event::MouseButtonPressed &&
@@ -511,24 +540,26 @@ void Game::handleMessageBoxInput(sf::Event event) {
       event.mouseButton.button == sf::Mouse::Left) {
     sf::Vector2f mousePos =
         gameWindow.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
+
     if (messageBoxOkButton.getGlobalBounds().contains(mousePos)) {
       State stateBeforeMessage = previousState;
       currentState = previousState;
 
-      if (rolledDoubleCurrentMove && !players[currentPlayerIndex].IsInJail()) {
-        diceResultText.setString(L"Дубль! Бросайте снова.");
-        actionRequired = false;
-        turnInProgress = true;
-
-        showRollDiceButton = true;
-        rollDiceButton.setFillColor(sf::Color::Green);
-        showBuyButton = false;
-        showEndTurnButton = false;
-        rolledDoubleCurrentMove = false;
+      if (stateBeforeMessage == State::GameOver) {
+        gameWindow.close();
       } else {
-        rolledDoubleCurrentMove = false;
-        if (stateBeforeMessage == State::Running) {
-          if (!turnInProgress && !actionRequired) {
+        if (rolledDoubleCurrentMove &&
+            !players[currentPlayerIndex].IsInJail()) {
+          diceResultText.setString(L"Дубль! Бросайте снова.");
+          actionRequired = false;
+          turnInProgress = true;
+          showRollDiceButton = true;
+          rollDiceButton.setFillColor(sf::Color::Green);
+          rolledDoubleCurrentMove = false;
+        } else {
+          rolledDoubleCurrentMove = false;
+          if (stateBeforeMessage == State::Running && !turnInProgress &&
+              !actionRequired) {
             startNextTurn();
           }
         }
@@ -899,15 +930,10 @@ void Game::playerAction_PayFee() {
     showMessage(messageToDisplay, false);
 
     currentPlayer.SetBankrupt(true);
+    playerAction_EndTurn();
   }
   updateUI();
-}
-
-void Game::playerAction_BeBankrupt() {
-  if (!actionRequired || !showBuyButton)
-    return;
-  Players::Players &currentPlayer = players[currentPlayerIndex];
-  currentPlayer.SetBankrupt(1);
+  updatePlayerTokens();
 }
 
 void Game::playerAction_BuyProperty() {
@@ -1200,10 +1226,16 @@ void Game::updatePlayerTokens() {
                   << i + 1 << " в updatePlayerTokens." << std::endl;
         continue;
       }
-      sf::Vector2f screenPos = getPositionOnScreen(pos);
-      float offsetX = baseOffsetX + playersOnCell[pos] * incrementX;
-      float offsetY = baseOffsetY + playersOnCell[pos] * incrementY;
-      playerTokens[i].setPosition(screenPos.x + offsetX, screenPos.y + offsetY);
+
+      if (!players[i].GetBankrupt()) {
+        sf::Vector2f screenPos = getPositionOnScreen(pos);
+        float offsetX = baseOffsetX + playersOnCell[pos] * incrementX;
+        float offsetY = baseOffsetY + playersOnCell[pos] * incrementY;
+        playerTokens[i].setPosition(screenPos.x + offsetX,
+                                    screenPos.y + offsetY);
+      } else {
+        playerTokens[i].setPosition(-1000, -1000);
+      }
       playersOnCell[pos]++;
     }
   }
@@ -1286,17 +1318,60 @@ void Game::render() {
 }
 
 void Game::renderGame() {
-  for (const auto &token : playerTokens) {
-    gameWindow.draw(token);
+  for (int i = 0; i < gameBoard.board.size(); ++i) {
+    auto &cell = gameBoard.board[i];
+    if (cell.getLVL() > 0) {
+      int x = cell.getPosX();
+      int y = cell.getPosY();
+      if (i > 0 && i < 10) {
+        markerSprite.setPosition(x + 1, y - 28);
+        markerText.setString(std::to_wstring(cell.getLVL()));
+        markerText.setPosition(x - 10, y - 27);
+      } else if (i > 10 && i < 20) {
+        markerSprite.setPosition(x + 14, y - 31);
+        markerText.setString(std::to_wstring(cell.getLVL()));
+        markerText.setPosition(x + 3, y - 30);
+      } else if (i > 20 && i < 30) {
+        markerSprite.setPosition(x + 2, y + 7);
+        markerText.setString(std::to_wstring(cell.getLVL()));
+        markerText.setPosition(x - 9, y + 8);
+      } else if (i > 30 && i < 40) {
+        markerSprite.setPosition(x - 14, y + 2);
+        markerText.setString(std::to_wstring(cell.getLVL()));
+        markerText.setPosition(x - 25, y + 3);
+      }
+      gameWindow.draw(markerSprite);
+      gameWindow.draw(markerText);
+    }
   }
 
-  for (const auto &cell : gameBoard.board) {
-    if (cell.getLVL() > 0) {
-      sf::CircleShape levelMarker(5.f);
-      levelMarker.setPosition(cell.getPosX() + 10, cell.getPosY() + 10);
-      levelMarker.setFillColor(sf::Color::Red);
-      gameWindow.draw(levelMarker);
+  std::vector<sf::Color> colors = {sf::Color::Red, sf::Color::Blue,
+                                   sf::Color::Green, sf::Color::Yellow};
+
+  for (int i = 0; i < gameBoard.board.size(); ++i) {
+    auto &cell = gameBoard.board[i];
+    if (cell.getOwnerIndex() != -1) {
+      sf::RectangleShape rectangle(sf::Vector2f(15.f, 15.f));
+      rectangle.setFillColor(colors[cell.getOwnerIndex() - 1]);
+      int x = cell.getPosX();
+      int y = cell.getPosY();
+      if (i > 0 && i < 10) {
+        rectangle.setPosition(x, y);
+      } else if (i > 10 && i < 20) {
+        rectangle.setPosition(x, y);
+
+      } else if (i > 20 && i < 30) {
+        rectangle.setPosition(x, y);
+
+      } else if (i > 30 && i < 40) {
+        rectangle.setPosition(x, y);
+      }
+      gameWindow.draw(rectangle);
     }
+  }
+
+  for (const auto &token : playerTokens) {
+    gameWindow.draw(token);
   }
 
   if (showRollDiceButton) {

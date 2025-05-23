@@ -24,6 +24,10 @@ private:
   sf::Sprite gameBackgroundSprite;
   sf::Font gameFont;
 
+  sf::Texture markerTexture;
+  sf::Sprite markerSprite;
+  sf::Text markerText;
+
   enum class State { Running, ConfirmingExit, DisplayingMessage, GameOver };
   State currentState;
   State previousState;
@@ -120,7 +124,7 @@ private:
   void playerAction_SellProperty();
   void playerAction_BuildHouse();
   void playerAction_SellHouse();
-  void playerAction_BeBankrupt();
   void playerAction_EndTurn();
+  void handleGameOverMessage();
   void showMessage(const std::wstring &message, bool endTurnAfter = true);
 };
