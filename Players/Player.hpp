@@ -33,16 +33,17 @@ public:
   void UpgradeStreet(std::vector<Streets::Streets> &board, int index);
   void DegradeStreet(std::vector<Streets::Streets> &board, int index);
 
-  void PayRent(Streets::Streets &board,
-               std::vector<Players> &players);
+  void PayRent(Streets::Streets &board, std::vector<Players> &players);
   void PayTax(int taxAmount);
   void EarnMoney(int m);
+
+  bool HasAllStreetsOfColor(const std::string &color,
+                            const std::vector<Streets::Streets> &board, const int& currentPlayerIndex) const;
 
   void GoToJail();
   void LeaveJail();
   bool IsInJail() const;
 
   static bool IsEnd(std::vector<Players> &players);
-
 };
 } // namespace Players

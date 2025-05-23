@@ -15,16 +15,16 @@ void Players::SellStreet(std::vector<Streets::Streets> &board, int index) {
     std::cout << "Это не улица, нельзя купить";
     return;
   }
+
   if (board[position].getOwnerIndex() == -1) {
     std::cout << "Некуплена никем";
     return;
   }
+
   if (board[position].getOwnerIndex() == index) {
-
     board[position].setOwnerIndex(-1);
-    money = money + board[position].getPrice() * 0.8;
+    money += board[position].getPrice() * 0.8;
     return;
-
   } else {
     std::cout << "Улица куплена не вами";
     return;
@@ -44,7 +44,7 @@ void Players::BuyStreet(std::vector<Streets::Streets> &board, int index) {
   if (board[position].getOwnerIndex() == -1) {
     if (board[position].getPrice() <= money) {
       board[position].setOwnerIndex(index);
-      money = money - board[position].getPrice();
+      money -= board[position].getPrice();
       return;
     } else {
       std::cout << "Недостаточно денег";
@@ -63,14 +63,16 @@ void Players::UpgradeStreet(std::vector<Streets::Streets> &board, int index) {
     std::cout << "Это не улица, нельзя прокачать";
     return;
   }
-  if (board[position].getLVL() == 5) {
+
+  if (board[position].getLVL() == 4) {
     std::cout << "Максимальный уровень";
     return;
   }
+
   if (board[position].getOwnerIndex() == index) {
     if (board[position].getlvlcost() < money) {
       board[position].setLVL(board[position].getLVL() + 1);
-      money = money - board[position].getlvlcost();
+      money -= board[position].getlvlcost();
       return;
     } else {
       std::cout << "Недостаточно денег";
@@ -81,6 +83,7 @@ void Players::UpgradeStreet(std::vector<Streets::Streets> &board, int index) {
     return;
   }
 }
+
 void Players::DegradeStreet(std::vector<Streets::Streets> &board, int index) {
   if (board[position].getType() != "улица") {
     std::cout << "Это не улица";
@@ -93,7 +96,7 @@ void Players::DegradeStreet(std::vector<Streets::Streets> &board, int index) {
   if (board[position].getOwnerIndex() == index) {
 
     board[position].setLVL(board[position].getLVL() - 1);
-    money = money + board[position].getlvlcost();
+    money += board[position].getlvlcost() * 0.8;
     return;
 
   } else {
@@ -101,10 +104,11 @@ void Players::DegradeStreet(std::vector<Streets::Streets> &board, int index) {
     return;
   }
 }
+
 void Players::SetMoney(int m) { money = m; }
 int Players::GetMoney() const { return money; }
-void Players::SetBankrupt(bool b){ bankrupt = b; }
-bool Players::GetBankrupt()const { return bankrupt; }
+void Players::SetBankrupt(bool b) { bankrupt = b; }
+bool Players::GetBankrupt() const { return bankrupt; }
 int Players::GetPosition() const { return position; }
 
 void Players::EarnMoney(int m) { this->money += m; }
@@ -116,7 +120,7 @@ void Players::PayRent(Streets::Streets &cell, std::vector<Players> &players) {
   }
   if (cell.getRent() < money) {
     players[cell.getOwnerIndex()].money += cell.getRent();
-    money -= cell.getRent();
+      money -= cell.getRent();
     return;
   } else {
     std::cout << "Недоcтаточно средств";
@@ -132,6 +136,24 @@ void Players::PayTax(int taxAmount) {
   money -= taxAmount;
 }
 
+bool Players::HasAllStreetsOfColor(const std::string &color,
+                                   const std::vector<Streets::Streets> &board,
+                                   const int &currentPlayerIndex) const {
+  int totalStreetsInColor = 0;
+  int ownedStreetsInColor = 0;
+
+  for (const auto &street : board) {
+    if (street.getColor() == color) {
+      totalStreetsInColor++;
+      if (street.getOwnerIndex() == (currentPlayerIndex + 1)) {
+        ownedStreetsInColor++;
+      }
+    }
+  }
+
+  return ownedStreetsInColor == totalStreetsInColor;
+}
+
 bool Players::IsEnd(std::vector<Players> &players) {
   int k = 0;
   for (int i = 0; i < players.size(); ++i) {
@@ -144,7 +166,6 @@ bool Players::IsEnd(std::vector<Players> &players) {
   }
   return false;
 }
-
 
 void Players::GoToJail() {
   isInJail = true;

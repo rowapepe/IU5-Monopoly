@@ -18,11 +18,17 @@ Game::Game()
   rolledDoubleCurrentMove = false;
   turnInProgress = true;
   actionRequired = false;
+  showRollDiceButton = true;
   showBuyButton = false;
   showEndTurnButton = false;
+  showBuildHouseButton = false;
+
+  showPayButton = false;
+  amountDueForPayment = 0;
+  currentPaymentContext = PaymentContext::None;
+  rentRecipientPlayerIndex = -1;
 
   rollDiceButton.setFillColor(sf::Color::Green);
-  jailPayButton.setFillColor(sf::Color::Yellow);
   updateUI();
   diceResultText.setString(L"Ход Игрока 1! Бросайте кости.");
 
@@ -54,7 +60,6 @@ void Game::setupUI() {
   setupGameUI();
   setupConfirmationUI();
   setupMessageBoxUI();
-  updateUI();
 }
 
 void Game::setupConfirmationUI() {
@@ -125,7 +130,7 @@ void Game::setupGameUI() {
 
   buyButton.setSize({150, 50});
   buyButton.setFillColor(sf::Color::Blue);
-  buyButton.setPosition(50, buttonY - 120);
+  buyButton.setPosition(50, buttonY - 180);
   buyText.setFont(gameFont);
   buyText.setString(L"Купить");
   buyText.setCharacterSize(20);
@@ -136,23 +141,90 @@ void Game::setupGameUI() {
   buyText.setPosition(buyButton.getPosition().x + buyButton.getSize().x / 2.0f,
                       buyButton.getPosition().y + buyButton.getSize().y / 2.0f);
 
+  sellButton.setSize({150, 50});
+  sellButton.setFillColor(sf::Color::Magenta);
+  sellButton.setPosition(windowSize.x - 230.f, buttonY - 180.f);
+  sellText.setFont(gameFont);
+  sellText.setString(L"Продать");
+  sellText.setCharacterSize(20);
+  sf::FloatRect textBoundsSell = sellText.getLocalBounds();
+  sellText.setOrigin(textBoundsSell.left + textBoundsSell.width / 2.0f,
+                     textBoundsSell.top + textBoundsSell.height / 2.0f);
+  sellText.setPosition(
+      sellButton.getPosition().x + sellButton.getSize().x / 2.0f,
+      sellButton.getPosition().y + sellButton.getSize().y / 2.0f);
+
   endTurnButton.setSize({180, 50});
   endTurnButton.setFillColor(sf::Color::Red);
-  endTurnButton.setPosition(50, buttonY - 180);
+  endTurnButton.setPosition(50, buttonY - 120);
   endTurnText.setFont(gameFont);
   endTurnText.setString(L"Закончить ход");
   endTurnText.setCharacterSize(20);
   endTurnText.setFillColor(sf::Color::White);
-  endTurnText.setOrigin(textBounds.left + textBounds.width / 2.0f,
-                        textBounds.top + textBounds.height / 2.0f);
+  sf::FloatRect endTurnTextBounds = endTurnText.getLocalBounds();
+  endTurnText.setOrigin(endTurnTextBounds.left + endTurnTextBounds.width / 2.0f,
+                        endTurnTextBounds.top +
+                            endTurnTextBounds.height / 2.0f);
   endTurnText.setPosition(
-      endTurnButton.getPosition().x + endTurnButton.getSize().x / 3.0f,
+      endTurnButton.getPosition().x + endTurnButton.getSize().x / 2.0f,
       endTurnButton.getPosition().y + endTurnButton.getSize().y / 2.0f);
+
+  payButton.setSize({150, 50});
+  payButton.setFillColor(sf::Color(255, 165, 0));
+  payButton.setPosition(50, buttonY - 240);
+  payButtonText.setFont(gameFont);
+  payButtonText.setString(L"Оплатить");
+  payButtonText.setCharacterSize(20);
+  payButtonText.setFillColor(sf::Color::Black);
+  sf::FloatRect textBoundsPay = payButtonText.getLocalBounds();
+  payButtonText.setOrigin(textBoundsPay.left + textBoundsPay.width / 2.0f,
+                          textBoundsPay.top + textBoundsPay.height / 2.0f);
+  payButtonText.setPosition(
+      payButton.getPosition().x + payButton.getSize().x / 2.0f,
+      payButton.getPosition().y + payButton.getSize().y / 2.0f);
+
+  buildHouseButton.setFillColor(sf::Color::Cyan);
+  buildHouseButtonText.setString(L"Построить дом");
+  buildHouseButtonText.setFillColor(sf::Color::Black);
+  buildHouseButton.setSize({180, 50});
+  buildHouseButton.setPosition(windowSize.x - 230.f, buttonY - 300);
+  buildHouseButtonText.setFont(gameFont);
+  buildHouseButtonText.setCharacterSize(20);
+  sf::FloatRect textBoundsBuild = buildHouseButtonText.getLocalBounds();
+  buildHouseButtonText.setOrigin(
+      textBoundsBuild.left + textBoundsBuild.width / 2.0f,
+      textBoundsBuild.top + textBoundsBuild.height / 2.0f);
+  buildHouseButtonText.setPosition(
+      buildHouseButton.getPosition().x + buildHouseButton.getSize().x / 2.0f,
+      buildHouseButton.getPosition().y + buildHouseButton.getSize().y / 2.0f);
+
+  sellHouseButton.setFillColor(sf::Color::Red);
+  sellHouseButtonText.setString(L"Продать дом");
+  sellHouseButtonText.setFillColor(sf::Color::White);
+  sellHouseButton.setSize({180, 50});
+  sellHouseButton.setPosition(windowSize.x - 230.f, buttonY - 240);
+  sellHouseButtonText.setFont(gameFont);
+  sellHouseButtonText.setCharacterSize(20);
+  sf::FloatRect textBoundsSellHouse = sellHouseButtonText.getLocalBounds();
+  sellHouseButtonText.setOrigin(
+      textBoundsSellHouse.left + textBoundsSellHouse.width / 2.0f,
+      textBoundsSellHouse.top + textBoundsSellHouse.height / 2.0f);
+  sellHouseButtonText.setPosition(
+      sellHouseButton.getPosition().x + sellHouseButton.getSize().x / 2.0f,
+      sellHouseButton.getPosition().y + sellHouseButton.getSize().y / 2.0f);
+
+  payAmountText.setFont(gameFont);
+  payAmountText.setCharacterSize(18);
+  payAmountText.setFillColor(sf::Color::Black);
+  payAmountText.setPosition(payButton.getSize().x / 2.0f - 5.f,
+                            payButton.getPosition().y +
+                                payButton.getSize().y / 2.0f + 30.f);
+  payAmountText.setString(L"");
 
   diceResultText.setFont(gameFont);
   diceResultText.setCharacterSize(18);
   diceResultText.setFillColor(sf::Color::Black);
-  diceResultText.setPosition(0, rollDiceButton.getPosition().y / 2.0f);
+  diceResultText.setPosition(0, rollDiceButton.getPosition().y / 3.0f);
   diceResultText.setString(L"");
 
   playerInfoText.setFont(gameFont);
@@ -161,17 +233,6 @@ void Game::setupGameUI() {
   playerInfoText.setPosition(windowSize.x - 230.f,
                              rollDiceButton.getPosition().y / 2.0f);
   playerInfoText.setString(L"");
-
-  jailPayButton.setSize({180, 50});
-  jailPayButton.setFillColor(sf::Color::Yellow);
-  jailPayButton.setPosition(windowSize.x - 230.f, buttonY- 120);
-  jailPayText.setFont(gameFont);
-  jailPayText.setString(L"Заплатить залог");
-  jailPayText.setCharacterSize(20);
-  jailPayText.setFillColor(sf::Color::Black);
-  textBounds = jailPayButton.getLocalBounds();
-  jailPayText.setOrigin(textBounds.left + textBounds.width / 2.0f,
-                        textBounds.top + textBounds.height / 2.0f);
 }
 
 void Game::setupMessageBoxUI() {
@@ -190,7 +251,6 @@ void Game::setupMessageBoxUI() {
   messageBoxText.setFont(gameFont);
   messageBoxText.setCharacterSize(20);
   messageBoxText.setFillColor(sf::Color::White);
-  messageBoxText.setOrigin(0, 0);
 
   messageBoxOkButton.setSize({100, 40});
   messageBoxOkButton.setFillColor(sf::Color(0, 100, 0));
@@ -221,7 +281,6 @@ void Game::setupPlayers(int numberOfPlayers) {
     token.setOutlineThickness(2.f);
     token.setOutlineColor(sf::Color::Black);
     token.setOrigin(token.getRadius(), token.getRadius());
-    token.setPosition(getPositionOnScreen(players[i].GetPosition()));
     playerTokens.push_back(token);
   }
   currentPlayerIndex = 0;
@@ -236,17 +295,14 @@ void Game::updateGameBackground() {
 
   sf::Vector2u windowSize = gameWindow.getSize();
   sf::Vector2u textureSize = gameBackgroundTexture.getSize();
-  float winWidth = static_cast<float>(windowSize.x);
-  float winHeight = static_cast<float>(windowSize.y);
-  float texWidth = static_cast<float>(textureSize.x);
-  float texHeight = static_cast<float>(textureSize.y);
-
-  float scale = std::min(winWidth / texWidth, winHeight / texHeight);
+  float scaleX = static_cast<float>(windowSize.x) / textureSize.x;
+  float scaleY = static_cast<float>(windowSize.y) / textureSize.y;
+  float scale = std::min(scaleX, scaleY);
   gameBackgroundSprite.setScale(scale, scale);
 
   sf::FloatRect spriteBounds = gameBackgroundSprite.getGlobalBounds();
-  float posX = (winWidth - spriteBounds.width) / 2.0f;
-  float posY = (winHeight - spriteBounds.height) / 2.0f;
+  float posX = (static_cast<float>(windowSize.x) - spriteBounds.width) / 2.0f;
+  float posY = (static_cast<float>(windowSize.y) - spriteBounds.height) / 2.0f;
   gameBackgroundSprite.setPosition(posX, posY);
 }
 
@@ -300,6 +356,7 @@ void Game::handleEvents() {
       setupMessageBoxUI();
       updatePlayerTokens();
     }
+
     if (event.type == sf::Event::KeyPressed &&
         event.key.code == sf::Keyboard::Escape) {
       if (currentState == State::Running) {
@@ -335,31 +392,69 @@ void Game::handleGameInput(sf::Event event) {
   if (Players::Players::IsEnd(players)) {
     currentState = State::GameOver;
   }
+
   if (currentState != State::Running) {
     gameWindow.close();
     return;
   }
+
   if (event.type == sf::Event::MouseButtonPressed &&
       event.mouseButton.button == sf::Mouse::Left) {
     sf::Vector2f mousePos =
         gameWindow.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
 
-    if (rollDiceButton.getGlobalBounds().contains(mousePos)) {
+    if (showRollDiceButton &&
+        rollDiceButton.getGlobalBounds().contains(mousePos)) {
+
+      if (actionRequired && !players[currentPlayerIndex].IsInJail()) {
+        return;
+      }
+
       int roll1 = Dice::RollDice();
       int roll2 = Dice::RollDice();
       int totalRoll = roll1 + roll2;
       bool isDouble = (roll1 == roll2);
 
-      std::wstringstream ss;
-      ss << L"Выпало: " << roll1 << L" + " << roll2 << L" = " << totalRoll
-         << (isDouble ? L" (Дубль!)" : L"");
-      diceResultText.setString(ss.str());
+      Players::Players &currentPlayer = players[currentPlayerIndex];
 
-      turnInProgress = false;
-      actionRequired = true;
-      rollDiceButton.setFillColor(sf::Color(150, 150, 150));
+      if (currentPaymentContext != PaymentContext::JailFee) {
+        showPayButton = false;
+        payAmountText.setString(L"");
+      }
 
-      processTurn(totalRoll, isDouble);
+      if (currentPlayer.IsInJail()) {
+        if (isDouble) {
+          currentPlayer.LeaveJail();
+          std::wstringstream ss;
+          ss << L"Дубль! (" << roll1 << L"+" << roll2
+             << L") Вы вышли из тюрьмы!\nДвигайтесь на " << totalRoll;
+          diceResultText.setString(ss.str());
+
+          showPayButton = false;
+          currentPaymentContext = PaymentContext::None;
+          payAmountText.setString(L"");
+
+          showRollDiceButton = false;
+          processTurn(totalRoll, false);
+        } else {
+          std::wstringstream ss;
+          ss << L"Не дубль (" << roll1 << L"+" << roll2
+             << L"). Остаетесь в тюрьме.";
+          diceResultText.setString(ss.str());
+          showRollDiceButton = false;
+          showPayButton = true;
+          actionRequired = true;
+          turnInProgress = false;
+          showEndTurnButton = true;
+        }
+      } else {
+        std::wstringstream ss;
+        ss << L"Выпало: " << roll1 << L" + " << roll2 << L" = " << totalRoll
+           << (isDouble ? L" (Дубль!)" : L"");
+        diceResultText.setString(ss.str());
+
+        processTurn(totalRoll, isDouble);
+      }
       return;
     }
 
@@ -368,9 +463,31 @@ void Game::handleGameInput(sf::Event event) {
       return;
     }
 
+    if (showSellButton && sellButton.getGlobalBounds().contains(mousePos)) {
+      playerAction_SellProperty();
+      return;
+    }
+
     if (showEndTurnButton &&
         endTurnButton.getGlobalBounds().contains(mousePos)) {
       playerAction_EndTurn();
+      return;
+    }
+
+    if (showPayButton && payButton.getGlobalBounds().contains(mousePos)) {
+      playerAction_PayFee();
+      return;
+    }
+
+    if (showBuildHouseButton &&
+        buildHouseButton.getGlobalBounds().contains(mousePos)) {
+      playerAction_BuildHouse();
+      return;
+    }
+
+    if (showSellHouseButton &&
+        sellHouseButton.getGlobalBounds().contains(mousePos)) {
+      playerAction_SellHouse();
       return;
     }
   }
@@ -402,6 +519,8 @@ void Game::handleMessageBoxInput(sf::Event event) {
         diceResultText.setString(L"Дубль! Бросайте снова.");
         actionRequired = false;
         turnInProgress = true;
+
+        showRollDiceButton = true;
         rollDiceButton.setFillColor(sf::Color::Green);
         showBuyButton = false;
         showEndTurnButton = false;
@@ -469,10 +588,32 @@ void Game::handleCommunityChestCard() {
 }
 
 void Game::handleJail() {
-  auto &player = players[currentPlayerIndex];
-  player.GoToJail();
+  Players::Players &currentPlayer = players[currentPlayerIndex];
+  currentPlayer.GoToJail();
   updatePlayerTokens();
-  showMessage(L"Вы в тюрьме! Оплатите $50 или дождитесь дубля.", false);
+
+  std::wstring jailMessage = L"Вы отправлены в тюрьму!";
+  if (consecutiveDoubles == 3) {
+    jailMessage = L"3 дубля подряд! Вы отправлены в тюрьму!";
+  }
+
+  diceResultText.setString(jailMessage);
+
+  amountDueForPayment = 50;
+  currentPaymentContext = PaymentContext::JailFee;
+
+  actionRequired = false;
+  turnInProgress = false;
+
+  showRollDiceButton = false;
+  showBuyButton = false;
+  showEndTurnButton = false;
+  showPayButton = false;
+
+  consecutiveDoubles = 0;
+  rolledDoubleCurrentMove = false;
+
+  showMessage(jailMessage, false);
 }
 
 void Game::processTurn(int diceRoll, bool isDouble) {
@@ -480,36 +621,22 @@ void Game::processTurn(int diceRoll, bool isDouble) {
     return;
 
   rolledDoubleCurrentMove = false;
+  showRollDiceButton = false;
 
   Players::Players &currentPlayer = players[currentPlayerIndex];
-
-  if (currentPlayer.IsInJail()) {
-    currentPlayer.PayTax(50);
-    currentPlayer.LeaveJail();
-    updateUI();
-    diceResultText.setString(
-        L"Вы заплатили $50 и вышли из тюрьмы. \nБросайте кости.");
-    turnInProgress = true;
-    actionRequired = false;
-    rollDiceButton.setFillColor(sf::Color::Green);
-    consecutiveDoubles = 0;
-    return;
-  }
 
   std::wstring turnLog = diceResultText.getString();
 
   if (isDouble) {
     consecutiveDoubles++;
     if (consecutiveDoubles == 3) {
-      turnLog += L"\n3 дубля подряд! Отправляйтесь в тюрьму!";
       handleJail();
-      consecutiveDoubles = 0;
-      actionRequired = false;
-      showMessage(turnLog, true);
+      return;
     }
     rolledDoubleCurrentMove = true;
   } else {
     consecutiveDoubles = 0;
+    rolledDoubleCurrentMove = false;
   }
 
   int oldPosition = currentPlayer.GetPosition();
@@ -569,10 +696,31 @@ void Game::processTurn(int diceRoll, bool isDouble) {
       }
     } else if (ownerIndex == (currentPlayerIndex + 1)) {
       turnLog += L"\nВаша собственность.";
+      std::string color = currentCell.getColor();
+      bool hasAllColorStreets = currentPlayer.HasAllStreetsOfColor(
+          color, gameBoard.board, currentPlayerIndex);
+      if (hasAllColorStreets && currentCell.getLVL() < 5) {
+        showBuildHouseButton = true;
+        turnLog += L"\nНажмите 'Построить дом'";
+        if (currentCell.getLVL() > 0) {
+          showSellHouseButton = true;
+          turnLog += L"\nили 'Продать дом'";
+        }
+      }
+      showSellButton = true;
+      turnLog += L"\nили 'Продать улицу'";
     } else {
-      currentPlayer.PayRent(currentCell, players);
+      amountDueForPayment = rent;
+      currentPaymentContext = PaymentContext::Rent;
+      rentRecipientPlayerIndex = ownerIndex - 1;
+
       turnLog += L"\nСобственность Игрока " + std::to_wstring(ownerIndex) +
-                 L". \nРента: $" + std::to_wstring(rent);
+                 L". \nРента: $" + std::to_wstring(rent) +
+                 L"\nНажмите 'Оплатить'.";
+
+      payAmountText.setString(L"К оплате: $" + std::to_wstring(rent));
+      showPayButton = true;
+      actionIsImmediatelyPending = true;
     }
   } else if (cellType == "шанс") {
     diceResultText.setString(turnLog);
@@ -584,41 +732,177 @@ void Game::processTurn(int diceRoll, bool isDouble) {
     return;
   } else if (cellType == "налог") {
     int taxAmount = currentCell.getRent();
-    turnLog += L"\nНалог! Заплатите $" + std::to_wstring(taxAmount);
-    currentPlayer.PayTax(taxAmount);
+    amountDueForPayment = taxAmount;
+    currentPaymentContext = PaymentContext::Tax;
+
+    turnLog += L"\nНалог! Заплатите $" + std::to_wstring(taxAmount) +
+               L"\nНажмите 'Оплатить'.";
+
+    payAmountText.setString(L"К оплате: $" + std::to_wstring(taxAmount));
+    showPayButton = true;
+    actionIsImmediatelyPending = true;
   } else if (cellType == "тюрьма" && cellNameStr == "Отправляйся в тюрьму") {
-    turnLog += L"\nОтправляйтесь в тюрьму!";
-    diceResultText.setString(turnLog);
     handleJail();
-    consecutiveDoubles = 0;
-    rolledDoubleCurrentMove = false;
     return;
+  } else if (cellType == "тюрьма" && cellNameStr == "Тюрьма") {
+    turnLog += L"\nВы просто на посещении\n тюрьмы.";
+  } else if (cellType == "старт") {
+    turnLog += L"\nВы на клетке Старт.";
+  } else if (cellType == "бесплатная парковка") {
+    turnLog += L"\nБесплатная парковка. Отдыхайте!";
   } else {
     turnLog += L"\n ";
   }
 
   diceResultText.setString(turnLog);
 
-  if (actionIsImmediatelyPending) {
+  if (showPayButton) {
     actionRequired = true;
-    turnInProgress = false;
+    showRollDiceButton = false;
+    showBuyButton = false;
+    showEndTurnButton = false;
+  } else if (actionIsImmediatelyPending && showBuyButton) {
+    actionRequired = true;
     showEndTurnButton = true;
   } else if (rolledDoubleCurrentMove && !currentPlayer.IsInJail()) {
     diceResultText.setString(diceResultText.getString() +
                              L"\nДубль! Бросайте снова.");
+    showRollDiceButton = true;
+    rollDiceButton.setFillColor(sf::Color::Green);
     actionRequired = false;
     turnInProgress = true;
-    rollDiceButton.setFillColor(sf::Color::Green);
-    showBuyButton = false;
-    showEndTurnButton = false;
   } else {
-    if (currentState != State::DisplayingMessage) {
+    showRollDiceButton = false;
+    if (currentState != State::DisplayingMessage && !actionRequired) {
       showEndTurnButton = true;
       actionRequired = true;
-      turnInProgress = false;
     }
   }
 }
+
+void Game::playerAction_PayFee() {
+  if (!showPayButton || (amountDueForPayment <= 0 &&
+                         currentPaymentContext != PaymentContext::JailFee)) {
+    if (currentPaymentContext == PaymentContext::JailFee &&
+        amountDueForPayment <= 0) {
+      amountDueForPayment = 50;
+    } else {
+      return;
+    }
+  }
+
+  Players::Players &currentPlayer = players[currentPlayerIndex];
+  std::wstring messageToDisplay;
+
+  if (currentPlayer.GetMoney() >= amountDueForPayment) {
+    currentPlayer.PayTax(amountDueForPayment);
+    bool paymentProcessedSuccessfully = true;
+
+    switch (currentPaymentContext) {
+    case PaymentContext::JailFee:
+      currentPlayer.LeaveJail();
+      messageToDisplay =
+          L"Вы заплатили $" + std::to_wstring(amountDueForPayment) +
+          L" и вышли из тюрьмы.\nТеперь бросайте кости для хода.";
+
+      showRollDiceButton = true;
+      rollDiceButton.setFillColor(sf::Color::Green);
+      turnInProgress = true;
+      actionRequired = false;
+      break;
+
+    case PaymentContext::Rent:
+      if (rentRecipientPlayerIndex >= 0 &&
+          rentRecipientPlayerIndex < static_cast<int>(players.size())) {
+        players[rentRecipientPlayerIndex].EarnMoney(amountDueForPayment);
+        messageToDisplay = L"Вы заплатили ренту $" +
+                           std::to_wstring(amountDueForPayment) + L" Игроку " +
+                           std::to_wstring(rentRecipientPlayerIndex + 1) + L".";
+      } else {
+        messageToDisplay = L"Ошибка: Получатель ренты не найден.";
+        paymentProcessedSuccessfully = false;
+      }
+
+      if (paymentProcessedSuccessfully) {
+        actionRequired = false;
+        if (rolledDoubleCurrentMove && !currentPlayer.IsInJail()) {
+          messageToDisplay += L"\nДубль! Бросайте снова.";
+          showRollDiceButton = true;
+          rollDiceButton.setFillColor(sf::Color::Green);
+          turnInProgress = true;
+
+        } else {
+          rolledDoubleCurrentMove = false;
+          showEndTurnButton = false;
+          actionRequired = true;
+          turnInProgress = false;
+        }
+      }
+      break;
+
+    case PaymentContext::Tax:
+      messageToDisplay =
+          L"Вы заплатили налог $" + std::to_wstring(amountDueForPayment) + L".";
+
+      actionRequired = false;
+      if (rolledDoubleCurrentMove && !currentPlayer.IsInJail()) {
+        messageToDisplay += L"\nДубль! Бросайте снова.";
+        showRollDiceButton = true;
+        rollDiceButton.setFillColor(sf::Color::Green);
+        turnInProgress = true;
+      } else {
+        rolledDoubleCurrentMove = false;
+        showEndTurnButton = true;
+        actionRequired = true;
+        turnInProgress = false;
+      }
+      break;
+
+    case PaymentContext::None:
+    default:
+      messageToDisplay = L"Ошибка: Неизвестный контекст для оплаты.";
+      paymentProcessedSuccessfully = false;
+      break;
+    }
+
+    if (paymentProcessedSuccessfully) {
+      showPayButton = false;
+      payAmountText.setString(L"");
+      int paidAmount = amountDueForPayment;
+      amountDueForPayment = 0;
+      PaymentContext paidContext = currentPaymentContext;
+      currentPaymentContext = PaymentContext::None;
+
+      if (paidContext != PaymentContext::JailFee) {
+        actionRequired = false;
+        if (rolledDoubleCurrentMove && !currentPlayer.IsInJail()) {
+          showRollDiceButton = true;
+          rollDiceButton.setFillColor(sf::Color::Green);
+          turnInProgress = true;
+        } else {
+          showEndTurnButton = true;
+          actionRequired = true;
+          turnInProgress = false;
+        }
+      }
+      showEndTurnButton = false;
+      showMessage(messageToDisplay, true);
+
+    } else {
+      showMessage(messageToDisplay, true);
+    }
+
+  } else {
+    messageToDisplay = L"Недостаточно средств для оплаты $" +
+                       std::to_wstring(amountDueForPayment) + L"!";
+
+    showMessage(messageToDisplay, false);
+
+    currentPlayer.SetBankrupt(true);
+  }
+  updateUI();
+}
+
 void Game::playerAction_BeBankrupt() {
   if (!actionRequired || !showBuyButton)
     return;
@@ -658,20 +942,174 @@ void Game::playerAction_BuyProperty() {
   }
 
   showBuyButton = false;
-  showEndTurnButton = true;
-  actionRequired = true;
+  actionRequired = false;
+
+  if (rolledDoubleCurrentMove && !currentPlayer.IsInJail()) {
+    diceResultText.setString(L"Покупка совершена. Дубль! \nБросайте снова.");
+    showRollDiceButton = true;
+    turnInProgress = true;
+    rollDiceButton.setFillColor(sf::Color::Green);
+    showEndTurnButton = false;
+  } else {
+    showEndTurnButton = true;
+    actionRequired = true;
+    turnInProgress = false;
+  }
+}
+
+void Game::playerAction_SellProperty() {
+  if (!actionRequired || !showSellButton)
+    return;
+
+  Players::Players &currentPlayer = players[currentPlayerIndex];
+  int pos = currentPlayer.GetPosition();
+  if (!IsPositionValid(pos))
+    return;
+
+  Streets::Streets &currentCell = gameBoard.board[pos];
+  std::string cellNameStr = currentCell.getName();
+  sf::String safeCellName =
+      sf::String::fromUtf8(cellNameStr.begin(), cellNameStr.end());
+
+  if (currentCell.getOwnerIndex() != (currentPlayerIndex + 1)) {
+    showMessage(L"Эта улица не ваша!", false);
+    return;
+  }
+
+  if (currentCell.getLVL() > 0) {
+    showMessage(L"Сначала продайте дома на этой улице!", false);
+    return;
+  }
+
+  currentPlayer.SellStreet(gameBoard.board, currentPlayerIndex + 1);
+  std::wstring message = L"Вы продали " + safeCellName.toWideString() +
+                         L" за $" + std::to_wstring(currentCell.getPrice() / 2);
+  showMessage(message, true);
+
+  showSellButton = false;
+  actionRequired = false;
+  if (rolledDoubleCurrentMove && !currentPlayer.IsInJail()) {
+    diceResultText.setString(L"Продажа совершена. Дубль! Бросайте снова.");
+    showRollDiceButton = true;
+    turnInProgress = true;
+    rollDiceButton.setFillColor(sf::Color::Green);
+    showEndTurnButton = false;
+  } else {
+    showEndTurnButton = true;
+    actionRequired = true;
+    turnInProgress = false;
+  }
+}
+
+void Game::playerAction_BuildHouse() {
+  if (!showBuildHouseButton)
+    return;
+
+  Players::Players &currentPlayer = players[currentPlayerIndex];
+  int pos = currentPlayer.GetPosition();
+  if (!IsPositionValid(pos))
+    return;
+
+  Streets::Streets &currentCell = gameBoard.board[pos];
+  std::string cellNameStr = currentCell.getName();
+  sf::String safeCellName =
+      sf::String::fromUtf8(cellNameStr.begin(), cellNameStr.end());
+
+  if (currentCell.getOwnerIndex() != (currentPlayerIndex + 1)) {
+    showMessage(L"Эта улица не ваша!", false);
+    return;
+  }
+
+  std::string color = currentCell.getColor();
+  bool hasAllColorStreets = currentPlayer.HasAllStreetsOfColor(
+      color, gameBoard.board, currentPlayerIndex);
+  if (!hasAllColorStreets) {
+    showMessage(L"Вы не владеете всеми улицами цвета " +
+                    std::wstring(color.begin(), color.end()) + L"!",
+                false);
+    return;
+  }
+
+  int currentHouses = currentCell.getLVL();
+  if (currentHouses == 4) {
+    showMessage(L"На этой улице уже максимальное количество домов!", false);
+    return;
+  }
+
+  int houseCost = currentCell.getlvlcost();
+  if (currentPlayer.GetMoney() < houseCost) {
+    showMessage(L"Недостаточно средств для постройки дома!", false);
+    return;
+  }
+
+  currentPlayer.UpgradeStreet(gameBoard.board, currentPlayerIndex + 1);
+
+  std::wstring message = L"Вы построили дом на " + safeCellName.toWideString() +
+                         L". Теперь здесь " +
+                         std::to_wstring(currentCell.getLVL()) + L" дом(а).";
+  showMessage(message, true);
+
+  updateUI();
+  showBuildHouseButton = false;
+}
+
+void Game::playerAction_SellHouse() {
+  if (!showSellHouseButton)
+    return;
+
+  Players::Players &currentPlayer = players[currentPlayerIndex];
+  int pos = currentPlayer.GetPosition();
+  if (!IsPositionValid(pos))
+    return;
+
+  Streets::Streets &currentCell = gameBoard.board[pos];
+  std::string cellNameStr = currentCell.getName();
+  sf::String safeCellName =
+      sf::String::fromUtf8(cellNameStr.begin(), cellNameStr.end());
+
+  if (currentCell.getOwnerIndex() != (currentPlayerIndex + 1)) {
+    showMessage(L"Эта улица не ваша!", false);
+    return;
+  }
+
+  if (currentCell.getLVL() == 0) {
+    showMessage(L"На этой улице нет домов!", false);
+    return;
+  }
+
+  std::string color = currentCell.getColor();
+  bool hasAllColorStreets = currentPlayer.HasAllStreetsOfColor(
+      color, gameBoard.board, currentPlayerIndex);
+  if (!hasAllColorStreets) {
+    showMessage(L"Вы не владеете всеми улицами цвета " +
+                    std::wstring(color.begin(), color.end()) + L"!",
+                false);
+    return;
+  }
+
+  currentPlayer.DegradeStreet(gameBoard.board, currentPlayerIndex + 1);
+  std::wstring message = L"Вы продали дом на " + safeCellName.toWideString() +
+                         L". Теперь здесь " +
+                         std::to_wstring(currentCell.getLVL()) + L" дом(а).";
+  showMessage(message, true);
+
+  showSellHouseButton = false;
+  updateUI();
 }
 
 void Game::playerAction_EndTurn() {
   std::cout << "Игрок " << currentPlayerIndex + 1 << " завершил действие/ход."
             << std::endl;
 
+  showBuildHouseButton = false;
+  showRollDiceButton = false;
   showBuyButton = false;
   showEndTurnButton = false;
   actionRequired = false;
 
   if (rolledDoubleCurrentMove && !players[currentPlayerIndex].IsInJail()) {
     diceResultText.setString(L"Действие завершено. Дубль! \nБросайте снова.");
+    showRollDiceButton = true;
     turnInProgress = true;
     rollDiceButton.setFillColor(sf::Color::Green);
     rolledDoubleCurrentMove = false;
@@ -683,21 +1121,45 @@ void Game::playerAction_EndTurn() {
 
 void Game::startNextTurn() {
   currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-  while (players[currentPlayerIndex].GetBankrupt() == true) {
+  while (players[currentPlayerIndex].GetBankrupt()) {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
   }
   consecutiveDoubles = 0;
   rolledDoubleCurrentMove = false;
 
-  turnInProgress = true;
-  actionRequired = false;
   showBuyButton = false;
   showEndTurnButton = false;
-  rollDiceButton.setFillColor(sf::Color::Green);
+  showPayButton = false;
+  showBuildHouseButton = false;
+  showSellButton = false;
+  showSellHouseButton = false;
+  payAmountText.setString(L"");
+  amountDueForPayment = 0;
+  currentPaymentContext = PaymentContext::None;
+
+  Players::Players &nextPlayer = players[currentPlayerIndex];
+
+  if (nextPlayer.IsInJail()) {
+    diceResultText.setString(
+        L"Вы в тюрьме! Заплатите $" + std::to_wstring(50) +
+        L", \nчтобы выйти, или бросайте \nкости на дубль.");
+    amountDueForPayment = 50;
+    currentPaymentContext = PaymentContext::JailFee;
+    payAmountText.setString(L"Залог: $" + std::to_wstring(50));
+    showPayButton = true;
+    showRollDiceButton = true;
+    rollDiceButton.setFillColor(sf::Color::Green);
+    actionRequired = true;
+    turnInProgress = false;
+  } else {
+    diceResultText.setString(L"Ваш ход! Бросайте кости.");
+    showRollDiceButton = true;
+    rollDiceButton.setFillColor(sf::Color::Green);
+    actionRequired = false;
+    turnInProgress = true;
+  }
 
   updateUI();
-  diceResultText.setString(L"Ваш ход! Бросайте кости.");
-
   std::cout << "\n--- Ход игрока " << currentPlayerIndex + 1 << " ---"
             << std::endl;
 }
@@ -791,6 +1253,18 @@ void Game::updateUI() {
     playerInfoText.setString(L"");
     turnIndicatorText.setString(L"");
   }
+
+  if (showPayButton && amountDueForPayment > 0) {
+    if (currentPaymentContext == PaymentContext::JailFee) {
+      payAmountText.setString(L"Залог: $" +
+                              std::to_wstring(amountDueForPayment));
+    } else {
+      payAmountText.setString(L"К оплате: $" +
+                              std::to_wstring(amountDueForPayment));
+    }
+  } else {
+    payAmountText.setString(L"");
+  }
 }
 
 void Game::render() {
@@ -825,12 +1299,7 @@ void Game::renderGame() {
     }
   }
 
-  if (players[currentPlayerIndex].IsInJail()) {
-    gameWindow.draw(jailPayButton);
-    gameWindow.draw(jailPayText);
-  }
-
-  if (turnInProgress) {
+  if (showRollDiceButton) {
     gameWindow.draw(rollDiceButton);
     gameWindow.draw(rollDiceText);
   }
@@ -840,9 +1309,30 @@ void Game::renderGame() {
     gameWindow.draw(buyText);
   }
 
+  if (showSellButton) {
+    gameWindow.draw(sellButton);
+    gameWindow.draw(sellText);
+  }
+
   if (showEndTurnButton) {
     gameWindow.draw(endTurnButton);
     gameWindow.draw(endTurnText);
+  }
+
+  if (showPayButton) {
+    gameWindow.draw(payButton);
+    gameWindow.draw(payButtonText);
+    gameWindow.draw(payAmountText);
+  }
+
+  if (showBuildHouseButton) {
+    gameWindow.draw(buildHouseButton);
+    gameWindow.draw(buildHouseButtonText);
+  }
+
+  if (showSellHouseButton) {
+    gameWindow.draw(sellHouseButton);
+    gameWindow.draw(sellHouseButtonText);
   }
 
   gameWindow.draw(diceResultText);

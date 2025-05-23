@@ -48,30 +48,47 @@ private:
   sf::Text rollDiceText;
   sf::RectangleShape buyButton;
   sf::Text buyText;
+  sf::RectangleShape sellButton;
+  sf::Text sellText;
   sf::RectangleShape endTurnButton;
   sf::Text endTurnText;
-  sf::RectangleShape jailPayButton;
-  sf::Text jailPayText;
+  sf::RectangleShape payButton;
+  sf::Text payButtonText;
+  sf::RectangleShape buildHouseButton;
+  sf::Text buildHouseButtonText;
+  sf::RectangleShape sellHouseButton;
+  sf::Text sellHouseButtonText;
 
   sf::Text diceResultText;
   sf::Text playerInfoText;
   sf::Text turnIndicatorText;
+  sf::Text payAmountText;
 
+  bool showPayButton = false;
+  bool showRollDiceButton = false;
   bool showBuyButton = false;
+  bool showSellButton = false;
   bool showEndTurnButton = false;
-  bool showJailPayButton = false;
+  bool showBuildHouseButton = false;
+  bool showSellHouseButton = false;
 
   sf::RectangleShape messageBoxBackground;
   sf::Text messageBoxText;
   sf::RectangleShape messageBoxOkButton;
   sf::Text messageBoxOkText;
 
-  std::vector<std::wstring> colors = {L"Красный", L"Синий", L"Зеленый", L"Желтый"};
+  std::vector<std::wstring> colors = {L"Красный", L"Синий", L"Зеленый",
+                                      L"Желтый"};
 
   Cards::Deck chanceDeck;
   Cards::Deck communityChestDeck;
   void handleChanceCard();
   void handleCommunityChestCard();
+
+  int amountDueForPayment;
+  int rentRecipientPlayerIndex;
+  enum class PaymentContext { None, Rent, Tax, JailFee };
+  PaymentContext currentPaymentContext;
 
   void loadResources();
   void setupUI();
@@ -98,7 +115,11 @@ private:
 
   void processTurn(int diceRoll, bool isDouble);
   void startNextTurn();
+  void playerAction_PayFee();
   void playerAction_BuyProperty();
+  void playerAction_SellProperty();
+  void playerAction_BuildHouse();
+  void playerAction_SellHouse();
   void playerAction_BeBankrupt();
   void playerAction_EndTurn();
   void showMessage(const std::wstring &message, bool endTurnAfter = true);
