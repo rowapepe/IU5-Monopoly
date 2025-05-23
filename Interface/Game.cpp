@@ -164,7 +164,7 @@ void Game::setupGameUI() {
 
   endTurnButton.setSize({180, 50});
   endTurnButton.setFillColor(sf::Color::Red);
-  endTurnButton.setPosition(50, buttonY - 120);
+  endTurnButton.setPosition(30, buttonY - 120);
   endTurnText.setFont(gameFont);
   endTurnText.setString(L"Закончить ход");
   endTurnText.setCharacterSize(20);
@@ -1356,15 +1356,15 @@ void Game::renderGame() {
       int x = cell.getPosX();
       int y = cell.getPosY();
       if (i > 0 && i < 10) {
-        rectangle.setPosition(x, y);
+        rectangle.setPosition(x-14, y-49);
       } else if (i > 10 && i < 20) {
-        rectangle.setPosition(x, y);
+        rectangle.setPosition(x+45, y-12);
 
       } else if (i > 20 && i < 30) {
-        rectangle.setPosition(x, y);
+        rectangle.setPosition(x-11, y+34);
 
       } else if (i > 30 && i < 40) {
-        rectangle.setPosition(x, y);
+        rectangle.setPosition(x-49, y-15);
       }
       gameWindow.draw(rectangle);
     }
