@@ -3,13 +3,13 @@
 #include <algorithm>
 #include <string>
 
-Game::Game()
+Game::Game(int playersNumber)
     : gameWindow(sf::VideoMode(1280, 800), L"Монополия - Игра",
                  sf::Style::Titlebar | sf::Style::Close),
       chanceDeck("шанс"), communityChestDeck("казна") {
   gameWindow.setVerticalSyncEnabled(true);
   loadResources();
-  setupPlayers(3);
+  setupPlayers(playersNumber);
   setupUI();
   currentState = State::Running;
   previousState = State::Running;

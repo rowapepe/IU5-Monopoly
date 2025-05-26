@@ -35,10 +35,12 @@ private:
   void setupMenuConfirmationUI();
   void drawMenuConfirmationUI();
   void adjustWindowSize(sf::Event::SizeEvent sizeEvent);
+  int playersNumber;
 
 public:
   Menu();
   MenuAction run();
   MenuAction handleEvents();
   void render();
+  int getPlayersNumber() const;
 };

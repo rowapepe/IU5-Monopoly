@@ -15,7 +15,7 @@
 class Game {
 public:
   enum class GameAction { Continue, ReturnToMenu, WindowClosed };
-  Game();
+  Game(int playersNumber);
   GameAction run();
 
 private:

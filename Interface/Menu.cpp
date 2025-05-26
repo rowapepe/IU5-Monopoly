@@ -30,6 +30,7 @@ Menu::Menu()
   volumeText.setCharacterSize(24);
   volumeText.setFillColor(sf::Color::Black);
   volumeText.setPosition(850, 460);
+  playersNumber = 3;
   currentState = State::Running;
   setupMenuConfirmationUI();
 }
@@ -250,3 +251,5 @@ void Menu::adjustWindowSize(sf::Event::SizeEvent sizeEvent) {
                             static_cast<float>(new_size.y));
   window.setView(sf::View(visibleArea));
 }
+
+int Menu::getPlayersNumber() const { return playersNumber; }

@@ -8,7 +8,7 @@ int main() {
         auto menuAction = menu.run();
 
         if (menuAction == Menu::MenuAction::Play) {
-            Game game;
+            Game game(menu.getPlayersNumber());
             if (game.run() == Game::GameAction::WindowClosed);
         }
         else if (menuAction != Menu::MenuAction::Continue) break;
