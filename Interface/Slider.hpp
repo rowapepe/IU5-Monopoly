@@ -10,8 +10,9 @@ private:
   bool isDragging;
 
 public:
-  Slider(float x, float y, float width, float min, float max);
+  Slider(float x, float y, float width, float min, float max, int type);
   void draw(sf::RenderWindow &window);
   void handleEvent(sf::Event event, sf::RenderWindow &window, sf::Music &music);
+  void handleEvent(sf::Event event, sf::RenderWindow &window, int& playersNumber);
   sf::FloatRect getBounds() const;
 };

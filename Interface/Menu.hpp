@@ -14,14 +14,15 @@ public:
 private:
   sf::RenderWindow window;
   sf::Font font;
-  sf::Text playText, settingsText, exitText, volumeText;
+  sf::Text playText, settingsText, exitText, volumeText, volumeTextNumbers, playersText, playersNumbersText;
   sf::RectangleShape playButton, settingsButton, exitButton;
   sf::Texture backgroundTexture;
   sf::Sprite backgroundSprite;
   std::vector<sf::CircleShape> playCorners, settingsCorners, exitCorners;
   sf::Music backgroundMusic;
   Slider volumeSlider;
-  enum class State { Running, ConfirmingExit };
+  Slider playerSelector;
+  enum class State { Running, Settings, ConfirmingExit };
   State currentState;
   sf::Text menuConfirmText;
   sf::RectangleShape menuConfirmBackground;

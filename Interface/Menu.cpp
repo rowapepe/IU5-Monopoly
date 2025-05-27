@@ -5,7 +5,8 @@
 Menu::Menu()
     : window(sf::VideoMode(1280, 800), L"Монополия - Меню",
              sf::Style::Titlebar | sf::Style::Close),
-      volumeSlider(800, 500, 200, 0, 100) {
+      volumeSlider(800, 400, 200, 0, 100, 1),
+      playerSelector(800, 300, 200, 2, 4, 2) {
   window.setVerticalSyncEnabled(true);
   if (!font.loadFromFile("../assets/KabelCTT Medium.ttf")) {
     std::cerr << "Ошибка загрузки шрифта!" << std::endl;
@@ -29,7 +30,26 @@ Menu::Menu()
   volumeText.setString(L"Громкость");
   volumeText.setCharacterSize(24);
   volumeText.setFillColor(sf::Color::Black);
-  volumeText.setPosition(850, 460);
+  volumeText.setPosition(850, 360);
+
+  volumeTextNumbers.setFont(font);
+  volumeTextNumbers.setString(L"0                         100");
+  volumeTextNumbers.setCharacterSize(24);
+  volumeTextNumbers.setFillColor(sf::Color::Black);
+  volumeTextNumbers.setPosition(800, 410);
+
+  playersText.setFont(font);
+  playersText.setString(L"Количество игроков");
+  playersText.setCharacterSize(24);
+  playersText.setFillColor(sf::Color::Black);
+  playersText.setPosition(790, 260);
+
+  playersNumbersText.setFont(font);
+  playersNumbersText.setString(L"2             3             4");
+  playersNumbersText.setCharacterSize(24);
+  playersNumbersText.setFillColor(sf::Color::Black);
+  playersNumbersText.setPosition(800, 310);
+
   playersNumber = 3;
   currentState = State::Running;
   setupMenuConfirmationUI();
@@ -144,59 +164,52 @@ Menu::MenuAction Menu::run() {
 Menu::MenuAction Menu::handleEvents() {
   sf::Event event;
   while (window.pollEvent(event)) {
-    if (currentState == State::Running) {
+    switch (currentState) {
+    case State::Running:
       if (event.type == sf::Event::Closed) {
         currentState = State::ConfirmingExit;
-        return MenuAction::Continue;
-      }
-      if (event.type == sf::Event::Resized) {
-        sf::FloatRect visibleArea(0.f, 0.f,
-                                  static_cast<float>(event.size.width),
-                                  static_cast<float>(event.size.height));
-        window.setView(sf::View(visibleArea));
-        setupMenuConfirmationUI();
-      }
-      if (event.type == sf::Event::KeyPressed &&
-          event.key.code == sf::Keyboard::Escape) {
+      } else if (event.type == sf::Event::KeyPressed &&
+                 event.key.code == sf::Keyboard::Escape) {
         currentState = State::ConfirmingExit;
-        return MenuAction::Continue;
-      }
-      if (event.type == sf::Event::MouseButtonPressed) {
-        if (event.mouseButton.button == sf::Mouse::Left) {
-          sf::Vector2f mousePos = window.mapPixelToCoords(
-              {event.mouseButton.x, event.mouseButton.y});
-          if (playButton.getGlobalBounds().contains(mousePos.x, mousePos.y) ||
-              isMouseOverCorners(playCorners, mousePos)) {
-            window.clear(sf::Color::White);
-            window.display();
-            backgroundMusic.stop();
-            window.close();
-            return MenuAction::Play;
-          } else if (settingsButton.getGlobalBounds().contains(mousePos.x,
-                                                               mousePos.y) ||
-                     isMouseOverCorners(settingsCorners, mousePos)) {
-            std::wcout << L"Настройки нажаты!" << std::endl;
-          } else if (exitButton.getGlobalBounds().contains(mousePos.x,
-                                                           mousePos.y) ||
-                     isMouseOverCorners(exitCorners, mousePos)) {
-            currentState = State::ConfirmingExit;
-            return MenuAction::Continue;
-          }
+      } else if (event.type == sf::Event::MouseButtonPressed &&
+                 event.mouseButton.button == sf::Mouse::Left) {
+        sf::Vector2f mousePos =
+            window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
+
+        if (playButton.getGlobalBounds().contains(mousePos) ||
+            isMouseOverCorners(playCorners, mousePos)) {
+          backgroundMusic.stop();
+          window.close();
+          return MenuAction::Play;
+        } else if (settingsButton.getGlobalBounds().contains(mousePos) ||
+                   isMouseOverCorners(settingsCorners, mousePos)) {
+          currentState = State::Settings;
+        } else if (exitButton.getGlobalBounds().contains(mousePos) ||
+                   isMouseOverCorners(exitCorners, mousePos)) {
+          currentState = State::ConfirmingExit;
         }
       }
-      volumeSlider.handleEvent(event, window, backgroundMusic);
-    } else if (currentState == State::ConfirmingExit) {
-      if (event.type == sf::Event::Closed) {
-        window.close();
-        return MenuAction::Exit;
-      }
+      break;
+
+    case State::Settings:
       if (event.type == sf::Event::KeyPressed &&
           event.key.code == sf::Keyboard::Escape) {
         currentState = State::Running;
-        return MenuAction::Continue;
+      } else {
+        volumeSlider.handleEvent(event, window, backgroundMusic);
+        playerSelector.handleEvent(event, window, playersNumber);
       }
-      if (event.type == sf::Event::MouseButtonPressed &&
-          event.mouseButton.button == sf::Mouse::Left) {
+      break;
+
+    case State::ConfirmingExit:
+      if (event.type == sf::Event::Closed) {
+        window.close();
+        return MenuAction::Exit;
+      } else if (event.type == sf::Event::KeyPressed &&
+                 event.key.code == sf::Keyboard::Escape) {
+        currentState = State::Running;
+      } else if (event.type == sf::Event::MouseButtonPressed &&
+                 event.mouseButton.button == sf::Mouse::Left) {
         sf::Vector2f mousePos =
             window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
         if (menuYesButton.getGlobalBounds().contains(mousePos)) {
@@ -204,9 +217,9 @@ Menu::MenuAction Menu::handleEvents() {
           return MenuAction::Exit;
         } else if (menuNoButton.getGlobalBounds().contains(mousePos)) {
           currentState = State::Running;
-          return MenuAction::Continue;
         }
       }
+      break;
     }
   }
   return MenuAction::Continue;
@@ -215,24 +228,34 @@ Menu::MenuAction Menu::handleEvents() {
 void Menu::render() {
   window.clear(sf::Color::Black);
   window.draw(backgroundSprite);
+
   if (currentState == State::Running) {
     for (const auto &corner : playCorners)
       window.draw(corner);
     window.draw(playButton);
     window.draw(playText);
+
     for (const auto &corner : settingsCorners)
       window.draw(corner);
     window.draw(settingsButton);
     window.draw(settingsText);
+
     for (const auto &corner : exitCorners)
       window.draw(corner);
     window.draw(exitButton);
     window.draw(exitText);
+
+  } else if (currentState == State::Settings) {
     window.draw(volumeText);
+    window.draw(volumeTextNumbers);
+    window.draw(playersText);
+    window.draw(playersNumbersText);
     volumeSlider.draw(window);
+    playerSelector.draw(window);
   } else if (currentState == State::ConfirmingExit) {
     drawMenuConfirmationUI();
   }
+
   window.display();
 }
 
